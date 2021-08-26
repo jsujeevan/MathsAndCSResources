@@ -1,0 +1,11 @@
+﻿@{
+    Layout = "~/Views/Shared/_PaneGridClickThrough.cshtml";
+}
+
+
+@section gridEventHandler{
+    $('#targetGridTable tbody').on('click', 'tr', function () {
+    var id = targetGridTable.row( this ).data()[0];
+    mainContent('@Url.Action("SingleQualIndex", "Resource")?id=' + id);
+    });
+}

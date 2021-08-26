@@ -1,0 +1,125 @@
+﻿@model MShed_Web.Models.UIModel.Resource.ResourceAddModel
+
+@{
+    Layout = null;
+    Guid ID_s = (Guid)ViewData["QualSubjectID"];
+}
+
+<div class="row">
+    <div class="col-md-12" id="validationAreaSaved" style="display:none;">
+        <p class="alert alert-success"><i class="fa fa-check"></i> Saved succesfully!</p>
+    </div>
+    <div class="col-md-12" id="validationAreaError" style="margin-top:10px; display:none;">
+        <p class="alert alert-danger"><i class="fa fa-times"></i> <span id="errorMessage">Error saving record</span></p>
+    </div>
+</div>
+
+<form onsubmit="return false;" id="documentForm" method="post" enctype="multipart/form-data">
+    <input type="hidden" id="id" name="id" value="@ID_s">
+    <div class="row">
+        <div class="col-md-12">
+            @{
+                Html.RenderPartial("_UserControlFormFields", Model);
+            }
+            <!-- File Input -->
+            <div class="form-group">
+                <label class="g-mb-10">File input</label>
+
+                <div class="input-group u-file-attach-v1 g-brd-gray-light-v2">
+                    <input id="filepathtext" name="filepathtext" class="form-control form-control-md rounded-0" readonly="" type="text">
+
+                    <div class="input-group-btn">
+                        <button class="btn btn-md h-100 u-btn-secondary rounded-0" type="submit">Browse</button>
+                        <input type="file" id="documentUpload" name="documentUpload" onchange="this.parentNode.nextSibling.value = this.value" >
+                    </div>
+                </div>
+            </div>
+            <!-- End File Input -->
+
+            <div class="form-group">
+                <div id="FileUploadStatus" style="display:none;">
+                    <p>
+                        <span id="ProgressBarStatus" class="txt-color-blueDark pull-right"></span>
+                    </p>
+                    <div class="progress">
+                        <div class="progress progress-striped">
+                            <div id="UploadProgressBar" class="progress-bar bg-color-blue" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 g-mb-10">
+                        <button class="btn btn-small u-btn-secondary pull-right" type="submit">Save Changes</button>
+                        <button class="btn btn-small u-btn-outline-gray-dark-v6 g-mr-10 pull-right" data-dismiss="modal" type="button">Close</button>
+                    </div>
+                </div>
+            </div>
+        <script>
+
+                $(function()
+                {
+                    $('#documentUpload').on('change',function ()
+                    {
+                        var filePath = $(this).val();
+                        $('#filepathtext').val(filePath);
+                    });
+                });
+
+                $("#documentForm").submit(function (e) {
+                    var name = $("#Name_s").val();
+                    var trimmedName = $.trim(name);
+                    if ($('#documentUpload').val() != '' & trimmedName != '') {
+                        $('#FileUploadStatus').show();
+                        var url = "@Url.Action("SingleQualSubjectResourceAdd","Resource")"; // the script where you handle the form input.
+
+                        $('#validationAreaError').hide();
+                        var data = new FormData(this);
+                        $.ajax({
+                            type: "POST",
+                            url: url,
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            data: data,
+                            async: true,
+                            success: function (data) {
+                                $('#FileUploadStatus').hide();
+                                obj = JSON.parse(data);
+                                $('#targetQualSubjectResourceGrid').dataTable().fnClearTable();
+                                if (obj != '') {
+                                    $('#targetQualSubjectResourceGrid').dataTable().fnAddData(obj);
+                                }
+                                $('#qualSubjectResourceAddModal').modal('hide')
+                                $('.modal-backdrop').hide();
+                                $('body').removeClass("modal-open");
+                            },
+                            error: function (request, status, error) {
+                                $('#FileUploadStatus').hide();
+                                $('#errorMessage').html(request.responseText);
+                                $('#validationAreaError').show();
+                            },
+                            xhr: function () {
+                                var xhr = new window.XMLHttpRequest();
+                                xhr.upload.onprogress = function (evt) {
+                                    if (evt.lengthComputable) {
+                                        var ratio = Math.floor((evt.loaded / evt.total) * 100) + '%';
+                                        $('#UploadProgressBar').css('width', ratio);
+                                        $('#ProgressBarStatus').html("&nbsp;<span><i class=\"fa fa-warning\"></i> " + ratio + " Completed</span>");
+                                    }
+                                }
+
+                                xhr.upload.onloadend = function (evt) {
+                                    $('#ProgressBarStatus').html("&nbsp;<span><i class=\"fas fa-sync fa-spin\"></i> Processing</span>");
+                                }
+
+                                return xhr;
+                            }
+                        });
+                    }
+                    e.preventDefault();
+                });
+        </script>
+    </div>
+</form>

@@ -1,0 +1,210 @@
+﻿@using System.Reflection
+@using System.Linq
+@using System.ComponentModel
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@using System.ComponentModel.DataAnnotations
+@using MShed_Web.BOs
+@using MShed_Web.Controllers
+@using MShed_Web.Support
+
+@model object
+
+    <div id="@Model.ToString()">
+
+        @{
+            string value_s = "";
+            string requiredClassName_s = "";
+
+            System.Type ModelType_o = Model.GetType();
+            for (int counter_i = 0; counter_i < ModelType_o.GetProperties().Length; counter_i++)
+            {
+                value_s = "";
+                requiredClassName_s = "";
+                PropertyInfo field_o = ModelType_o.GetProperties()[counter_i];
+                String displayName_s = field_o.GetCustomAttributes(typeof(DisplayNameAttribute), true).Cast<DisplayNameAttribute>().Single().DisplayName;
+
+                if (field_o.GetValue(Model) != null)
+                {
+                    value_s = field_o.GetValue(Model).ToString();
+                }
+
+                if (field_o.GetCustomAttributes(typeof(RequiredAttribute), true).Cast<RequiredAttribute>().Count() > 0)
+                {
+                    requiredClassName_s = " state-success";
+                }
+
+                bool hidden_b = false;
+                bool readOnly_b = false;
+                bool lookup_b = false;
+                UIControl controlType_o = UIControl.Text;
+                bool uiType_b = false;
+
+
+                if (field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Count() > 0)
+                {
+                    hidden_b = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().Hidden;
+                    readOnly_b = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().ReadOnly;
+                    lookup_b = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().Lookup;
+                    controlType_o = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().UIControl;
+                    uiType_b = true;
+                }
+
+                if (hidden_b)
+                {
+                    <input type="hidden" value="@value_s" id="@field_o.Name" name="@field_o.Name" />
+                }
+                else if (readOnly_b)
+                {
+                    <div class="form-group g-mb-30">
+                        <label class="g-mb-10">@displayName_s</label>
+                        <div class="g-pos-rel">
+                            <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                            </span>
+                            <input id="@field_o.Name" name="@field_o.Name" class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-10" type="text" value="@field_o.GetValue(Model)" readonly />
+                        </div>
+                    </div>
+                }
+                else if (lookup_b)
+                {
+                    string lookupObject_s = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().LookupObject;
+                    string lookupMethod_s = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().LookupMethod;
+                    string lookupFieldName_s = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().LookupFieldName;
+                    string lookupFieldValue_s = field_o.GetCustomAttributes(typeof(UIField), true).Cast<UIField>().Single().LookupFieldValue;
+
+                    Type objectType_o = Type.GetType(lookupObject_s);
+                    Object lookupObject_o = Activator.CreateInstance(objectType_o);
+
+                    MethodInfo method_o = Type.GetType(lookupObject_s).GetMethod(lookupMethod_s);
+                    var tempResults_k = method_o.Invoke(lookupObject_o, new Object[] { new Dictionary<string, object>() });
+
+                    PropertyInfo resultsCount_o = tempResults_k.GetType().GetProperty("Count");
+                    int resultCount_i = (int)resultsCount_o.GetValue(tempResults_k, null);
+
+                    string output_s = JsonConvert.SerializeObject(tempResults_k);
+                    dynamic object_k = JsonConvert.DeserializeObject(output_s);
+
+                    <div class="form-group g-mb-30">
+                        <label class="g-mb-10">@displayName_s</label>
+                        <div class="g-pos-rel @requiredClassName_s">
+                            <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                            </span>
+                            <select id="@field_o.Name" name="@field_o.Name" class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-10">
+                                <option value=""></option>
+                                @for (int i = 0; i < resultCount_i; i++)
+                                {
+                                    JObject vl_JSON_o = JObject.FromObject(object_k[i]);
+
+                                    string lookupIndex_i = (string)vl_JSON_o[lookupFieldName_s];
+                                    string lookupValue_s = (string)vl_JSON_o[lookupFieldValue_s];
+
+                                    if (lookupIndex_i == (string)field_o.GetValue(Model).ToString())
+                                    {
+                                        <option value="@lookupIndex_i" selected>@lookupValue_s</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@lookupIndex_i">@lookupValue_s</option>
+                                    }
+
+                                }
+                            </select>
+                        </div>
+                    </div>
+                }
+                else
+                {
+
+                    string uiClass_s = "";
+                    if (uiType_b)
+                    {
+                        if (controlType_o == UIControl.DateTime)
+                        {
+                            uiClass_s += "datepicker";
+                            if (value_s == new DateTime().ToString())
+                            {
+                                value_s = "";
+                            }
+                            else
+                            {
+                                value_s = ((DateTime)field_o.GetValue(Model)).ToString("dd/MM/yyyy");
+                            }
+
+                            <div class="form-group g-mb-30">
+                                <label class="g-mb-10">@displayName_s</label>
+                                <div class="g-pos-rel @requiredClassName_s">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                    <input id="@field_o.Name" name="@field_o.Name" class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-10 @uiClass_s" type="text" value="@value_s" />
+                                </div>
+                            </div>
+
+                        }
+                        else if (controlType_o == UIControl.CheckBox)
+                        {
+                            <div class="form-group g-mb-30">
+                                <label class="g-mb-10">@displayName_s</label>
+                                <div class="g-pos-rel @requiredClassName_s">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                    <select id="@field_o.Name" name="@field_o.Name">
+                                        <option value=""></option>
+                                        @if (value_s == "True")
+                                        {
+                                            <option value="True" selected>Yes</option>
+                                            <option value="False">No</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="True">Yes</option>
+                                            <option value="False" selected>No</option>
+                                        }
+
+                                    </select>
+                                </div>
+                            </div>
+
+                        }
+                        else if (controlType_o == UIControl.TextArea)
+                        {
+                            <!-- Textarea -->
+                            <div class="form-group g-mb-30">
+                                <label class="g-mb-10">@displayName_s</label>
+                                <textarea id="@field_o.Name" name="@field_o.Name" class="form-control form-control-md g-resize-none g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4" rows="3">@value_s</textarea>
+                                @*
+                                <small class="form-text text-muted g-font-size-default g-mt-10">
+                                    <strong>Note:</strong> height of the textarea depends on the rows attribute.
+                                </small>
+                                *@
+                            </div>
+                            <!-- End Textarea -->
+                        }
+                        else
+                        {
+                            <div class="form-group g-mb-30">
+                                <label class="g-mb-10">@displayName_s</label>
+                                <div class="g-pos-rel @requiredClassName_s">
+                                    <span class="g-pos-abs g-top-0 g-right-0 d-block g-width-40 h-100 opacity-0 g-opacity-1--success">
+                                        <i class="hs-admin-check g-absolute-centered g-font-size-default g-color-secondary"></i>
+                                    </span>
+                                    <input id="@field_o.Name" name="@field_o.Name" class="form-control form-control-md g-brd-gray-light-v7 g-brd-gray-light-v3--focus g-rounded-4 g-px-14 g-py-10 @uiClass_s" type="text" value="@value_s" />
+                                </div>
+                            </div>
+                        }
+                    }
+
+                }
+            }
+        }
+
+        <script>
+        $(function () {
+            $("#@Model.ToString() .datepicker").datepicker({ dateFormat: 'dd/mm/yy' });
+        });
+        </script>
+
+    </div>

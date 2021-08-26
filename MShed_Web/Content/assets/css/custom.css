@@ -1,0 +1,30 @@
+/* Add here all your css styles (customizations) */
+dataTables_length, .dataTables_filter, .dataTables_info, .dataTables_paginate {
+    display: block;
+}
+
+table.dataTable {
+    border-collapse: collapse!important;
+}
+
+table.table-bordered.dataTable th, table.table-bordered.dataTable td {
+    border-left-width: 0;
+}
+
+table.dataTable th {
+    background-color: #ffffff !important;
+}
+
+table.dataTable thead th, table.dataTable tfoot th {
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    color: #eee;
+    border-color: #097aab;
+    background-color: #097aab;
+}
+
+.DisplayArea {
+    min-height: 600px;
+}

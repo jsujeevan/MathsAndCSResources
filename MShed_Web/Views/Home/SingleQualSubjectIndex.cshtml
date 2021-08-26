@@ -1,0 +1,199 @@
+﻿@model MShed_Web.Models.UIModel.Qual.QualSubjectModel
+
+
+@{
+    string checked_s = "";
+    Dictionary<int, MShed_Web.Models.DataModel.Resource.ResourceType_Model> resourceTypeLookupList_k = (Dictionary<int, MShed_Web.Models.DataModel.Resource.ResourceType_Model>)ViewData["ResourceTypeList"];
+    Dictionary<int, MShed_Web.Models.DataModel.Resource.ResourceSupportingType_Model> supportingResourceTypeLookupList_k = (Dictionary<int, MShed_Web.Models.DataModel.Resource.ResourceSupportingType_Model>)ViewData["SupportingResourceTypeList"];
+    List<MShed_Web.Models.UIModel.Resource.Resource_Model> resourceUIList_k = (List<MShed_Web.Models.UIModel.Resource.Resource_Model>)ViewData["ResourceList"];
+    List<MShed_Web.Models.UIModel.Resource.ResourceSupporting_Model> supportingResourceUIList_k = (List<MShed_Web.Models.UIModel.Resource.ResourceSupporting_Model>)ViewData["SupportingResourceList"];
+}
+
+<!-- Programs -->
+<div class="container DisplayArea g-pt-10">
+    <div class="row">
+        <div class="col-lg-3 g-mb-10">
+            <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-5 g-pa-5--md g-mb-10">
+                <h3 class="h4">Subject Resources</h3>
+                <!-- Start Inline Checkboxes -->
+                <div class="g-mb-5">
+                    @{
+                            foreach (KeyValuePair<int, MShed_Web.Models.DataModel.Resource.ResourceType_Model> qualSubjectResourceType_o in resourceTypeLookupList_k)
+                            {
+                                checked_s = "checked";
+                                <label class="form-check-inline u-check g-pl-25">
+                                    <input id="Chk_QualSubjectResourceType_@qualSubjectResourceType_o.Key" name="Chk_QualSubjectResourceType_@qualSubjectResourceType_o.Key" class="QualSubjectResourceType g-hidden-xs-up g-pos-abs g-top-0 g-left-0" @checked_s type="checkbox">
+                                    <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0">
+                                        <i class="fa" data-check-icon="&#xf00c"></i>
+                                    </div>
+                                    @qualSubjectResourceType_o.Value.ResourceType_s
+                                </label>
+                            }
+                    }
+
+
+
+                    @*
+                    <label class="form-check-inline u-check g-pl-25">
+                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0" type="checkbox">
+                        <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0">
+                            <i class="fa" data-check-icon="&#xf00c"></i>
+                        </div>
+                        Practice Exam Papers
+                    </label>
+
+                    <label class="form-check-inline u-check g-pl-25">
+                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0" type="checkbox">
+                        <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0">
+                            <i class="fa" data-check-icon="&#xf00c"></i>
+                        </div>
+                        Model Papers
+                    </label>
+
+                    <label class="form-check-inline u-check g-pl-25">
+                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0" type="checkbox">
+                        <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0 g-transition-0_2 g-transition--ease-in">
+                            <i class="fa" data-check-icon="&#xf00c"></i>
+                        </div>
+                        Solution Bank
+                    </label>
+                    *@
+                </div>
+                <!-- End Inline Checkboxes -->
+                <h3 class="h4">Supporting Resources</h3>
+                <!-- Start Inline Checkboxes -->
+                <div class="g-mb-10">
+
+                    @{
+                        foreach (KeyValuePair<int, MShed_Web.Models.DataModel.Resource.ResourceSupportingType_Model> supportingResourceType in supportingResourceTypeLookupList_k)
+                        {
+                            checked_s = "checked";
+                            <label class="form-check-inline u-check g-pl-25">
+                                <input id="Chk_QualSubjectSupportingResourceType_@supportingResourceType.Key" name="Chk_QualSubjectSupportingResourceType_@supportingResourceType.Key" class="QualSubjectSupportingResourceType g-hidden-xs-up g-pos-abs g-top-0 g-left-0" @checked_s type="checkbox">
+                                <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0">
+                                    <i class="fa" data-check-icon="&#xf00c"></i>
+                                </div>
+                                @supportingResourceType.Value.ResourceSupportingType_s
+                            </label>
+                        }
+                    }
+                    @*
+                    <label class="form-check-inline u-check g-pl-25">
+                        <input class="g-hidden-xs-up g-pos-abs g-top-0 g-left-0" type="checkbox">
+                        <div class="u-check-icon-checkbox-v6 g-absolute-centered--y g-left-0">
+                            <i class="fa" data-check-icon="&#xf00c"></i>
+                        </div>
+                        Marking Scheme
+                    </label>
+                    *@
+                </div>
+                <!-- End Inline Checkboxes -->
+            </div>
+        </div>
+        <div class="col-lg-9 g-mb-5">
+            <div class="mb-1">
+                <h2>@Model.QualSubject_s</h2>
+                <p>@Model.QualSubject_Description_s</p>
+            </div>
+
+            <div class="g-px-15 mb-5">
+                <!-- Heading -->
+                <div class="row g-bg-main g-color-white g-font-size-16 g-py-15">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center">
+                            <h2 class="h5 mb-0">
+                                <a class="u-link-v5 g-color-white-opacity-0_8 g-color-white--hover" href="#">
+                                    <i class="g-font-size-20 material-icons">swap_vert</i>
+                                    Subject documents
+                                </a>
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center">
+                            <h3 class="h5 mb-0">
+                                <a class="u-link-v5 g-color-white-opacity-0_8 g-color-white--hover" href="#">
+                                    <i class="g-font-size-20 material-icons">swap_vert</i>
+                                    Supporting documents
+                                </a>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Heading -->
+
+                @{
+                    string class_s = "";
+                    string subClass_s = "";
+                    foreach (MShed_Web.Models.UIModel.Resource.Resource_Model qualSubjectResource_o in resourceUIList_k)
+                    {
+                        string div_s = "";
+                        subClass_s = "";
+                        class_s = "HasQualSubjectResourceType_" + qualSubjectResource_o.FK_ResourceType_i;
+                        List<MShed_Web.Models.UIModel.Resource.ResourceSupporting_Model> supportingResourceList_k = supportingResourceUIList_k.Where(m=>m.FK_Resource_ID_s == qualSubjectResource_o.PK_Resource_ID_s).ToList();
+                        foreach (MShed_Web.Models.UIModel.Resource.ResourceSupporting_Model supportingResource_o in supportingResourceList_k)
+                        {
+                            string tempSupportingResource_s = " HasQualSubjectSupportingResourceType_" + supportingResource_o.FK_ResourceSupportingType_i;
+                            subClass_s = subClass_s + tempSupportingResource_s;
+                            div_s = div_s + "<div>" + supportingResourceTypeLookupList_k[supportingResource_o.FK_ResourceSupportingType_i].ResourceSupportingType_s + "</div>";
+                        }
+
+                        <div class="row @class_s @subClass_s g-brd-around g-brd-top-none g-brd-secondary-light-v2 g-font-size-16 g-py-15">
+                            <div class="col-sm-6">
+                                <span class="fa fa-pdf"><a href="@Url.Action("Download","Document",new {id = qualSubjectResource_o.FK_Document_ID_s } )">@qualSubjectResource_o.Name_s</a></span>
+                            </div>
+                            <div class="col-sm-6">
+                                @Html.Raw(div_s)
+                            </div>
+                        </div>
+                    }
+                }
+
+            </div>
+            @*
+            <!-- Pagination -->
+            <nav aria-label="Page Navigation">
+                <ul class="list-inline mb-0">
+                    <li class="list-inline-item">
+                        <a class="active u-pagination-v1__item g-width-30 g-height-30 g-brd-secondary-light-v2 g-brd-primary--active g-color-white g-bg-primary--active g-font-size-12 rounded g-pa-5" href="#">1</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="u-pagination-v1__item g-width-30 g-height-30 g-color-text-light-v1 g-color-primary--hover g-font-size-12 rounded g-pa-5" href="#">2</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="u-pagination-v1__item g-width-30 g-height-30 g-color-text-light-v1 g-color-primary--hover g-font-size-12 rounded g-pa-5" href="#">3</a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a class="u-pagination-v1__item g-width-30 g-height-30 g-brd-secondary-light-v2 g-brd-primary--hover g-color-text-light-v1 g-color-primary--hover g-font-size-12 rounded g-pa-5 g-ml-15" href="#" aria-label="Next">
+                            <span aria-hidden="true">
+                                <i class="fa fa-angle-right"></i>
+                            </span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                    <li class="list-inline-item float-right">
+                        <span class="u-pagination-v1__item-info g-color-gray-dark-v4 g-font-size-12 g-pa-5">Page 1 of 3</span>
+                    </li>
+                </ul>
+            </nav>
+            <!-- End Pagination -->
+                *@
+        </div>
+    </div>
+
+</div>
+<!-- End Programs -->
+
+<script>
+    $(".QualSubjectResourceType").change(function () {
+        var itemid = $(this).attr('id');
+        var itemclass = itemid.replace("Chk_QualSubjectResourceType_", "HasQualSubjectResourceType_");
+        $("."+itemclass).toggle();
+    });
+    $(".QualSubjectSupportingResourceType").change(function () {
+        var itemid = $(this).attr('id');
+        var itemclass = itemid.replace("Chk_QualSubjectSupportingResourceType_", "HasQualSubjectSupportingResourceType_");
+        alert(itemclass);
+        $("." + itemclass).toggle();
+    });
+</script>

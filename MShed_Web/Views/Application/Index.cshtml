@@ -1,0 +1,37 @@
+﻿
+@{
+    string Redirect_s = (string)ViewData["RedirectUrl"];
+}
+<!-- Breadcrumb-v1 -->
+<div class="g-hidden-sm-down g-bg-gray-light-v8 g-pa-10">
+    <ul id="breadcrumbNav" class="u-list-inline g-color-gray-dark-v6"></ul>
+</div>
+<!-- End Breadcrumb-v1 -->
+<div id="MainContainer" style="min-height:300px;">
+</div>
+
+<script>
+    $(document).ready(function () {
+        @{
+            if (string.IsNullOrEmpty(Redirect_s))
+            {
+                Redirect_s = Url.Action("Index","Dashboard");
+            }
+            @Html.Raw("mainContent('" + Redirect_s + "',false);");
+        }
+    });
+
+    function mainContent(URL_s,FromMenu_b) {
+        if (FromMenu_b) {
+            $("#breadcrumbNav").html("");
+            $("#breadcrumbNav").append('<li class="list-inline-item g-mr-10"><a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle" href="@Url.Action("Index","Application")">Home</a><i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i></li>')
+        }
+        $("#MainContainer").load(URL_s);
+        window.history.pushState("", "", URL_s);
+    }
+
+    $(window).on("popstate", function (e) {
+        alert('popstate');
+        location.reload();
+    });
+</script>

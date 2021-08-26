@@ -1,0 +1,177 @@
+﻿@model MShed_Web.Models.Dispatching.PageModel
+@using MShed_Web.Models.Dispatching
+@using MShed_Web.Models.Dispatching.Content
+
+@{
+    Layout = "~/Views/Shared/_PaneSimple.cshtml";
+    SingleQualSubjectContentModel SingleQualSubjectContentModel_o = (SingleQualSubjectContentModel)Model.PageContentModel;
+    MShed_Web.Models.UIModel.Qual.QualSubjectEditModel QualSubjectEditModel_o = (MShed_Web.Models.UIModel.Qual.QualSubjectEditModel)SingleQualSubjectContentModel_o.QualificationSubject;
+}
+
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="_action_generalDetails" data-toggle="tab" href="#">General Details</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="_action_Resources" data-toggle="tab" href="#">Resources</a>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="row tab-pane g-mt-10" id="_tab_generalDetails">
+        <form id="EditQualSubjectFrm">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="successDisplay" style="display:none;">
+                <p class="alert alert-success"><i class="fa fa-check"></i> Saved succesfully!</p>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="errorDisplay" style="margin-top:10px; display:none;">
+                <p class="alert alert-danger"><i class="fa fa-times"></i> <span id="errorMessage">Error saving record</span></p>
+            </div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <!-- Basic Text Inputs -->
+                <div class="g-brd-around g-brd-gray-light-v7 g-rounded-4 g-pa-15 g-pa-20--md g-mb-30">
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 g-mb-10">
+                            <button class="btn btn-small u-btn-secondary pull-right" type="submit">Save Changes</button>
+                            <a class="btn btn-small u-btn-outline-gray-dark-v6 g-mr-10 pull-right" href="@Url.Action("QualSubjectIndex","Resource")">Cancel</a>
+                        </div>
+                    </div>
+                    @*<h3 class="d-flex align-self-center text-uppercase g-font-size-12 g-font-size-default--md g-color-black g-mb-20">Basic Text Inputs</h3>*@
+                    @{Html.RenderPartial("_UserControlFormFields", QualSubjectEditModel_o); }
+                </div>
+                <!-- End Basic Text Inputs -->
+            </div>
+        </form>
+
+        <script>
+         $("#EditQualSubjectFrm").submit(function (e) {
+            var url = "@Url.Action("SingleQualSubjectEdit", "Resource")"; // the script where you handle the form input.
+            $('#successDisplay').hide();
+            $('#errorDisplay').hide();
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: $("#EditQualSubjectFrm").serialize(), // serializes the form's elements.
+                success: function (data) {
+                    if (data == "") {
+                        $('#successDisplay').show();
+                    }
+                    else {
+                        $('#errorMessage').html(data);
+                        $('#errorDisplay').show();
+                    }
+                },
+                error: function (request, status, error) {
+                    $('#errorMessage').html(request.responseText);
+                    $('#errorDisplay').show();
+                }
+            });
+            e.preventDefault();
+        });
+        </script>
+
+    </div>
+    <div class="row tab-pane g-mt-10" id="_tab_Resources">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <h3 class="g-font-weight-300 g-font-size-20 g-color-black mt-0 mb-0">Main Resources</h3>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 g-mb-10">
+            <div class="row">
+                <div class="col-md-12">
+                    <button id="AddNewQualSubjectResource" class="btn btn-small u-btn-secondary pull-right" type="button">Add New</button>
+                </div>
+            </div>
+        </div>
+        <script>
+
+            $("#AddNewQualSubjectResource").click(function () {
+                $('#model-body-qualSubjectResourceAddModal').load('@Url.Action("SingleQualSubjectResourceAdd", "Resource")?modal=' + 'qualSubjectResourceAddModal' + '&id=@QualSubjectEditModel_o.PK_QualSubject_ID_s');
+                $('#modal-title-qualSubjectResourceAddModal').html('Resource > Add New');
+                $('#qualSubjectResourceAddModal').modal('show');
+            });
+        </script>
+
+        <table id="targetQualSubjectResourceGrid" class="table table-striped table-bordered" style="width:100%"></table>
+    </div>
+</div>
+
+<div class="col-lg-12">
+    @Html.Partial("_ModalDialog", "qualSubjectResourceAddModal")
+</div>
+
+<div class="col-lg-12">
+    @Html.Partial("_ModalDialog", "qualSubjectSupportingResourceAddModal")
+</div>
+
+<script>
+    $('.nav-link').click(function (event) {
+        if (event.target.id != "") {
+            selectTab(event.target.id);
+        }
+    });
+    function selectTab(selectedLink) {
+        $('.tab-pane').hide();
+        var selectedTab = selectedLink.replace("_action_", "_tab_");
+        $('#' + selectedTab).show();
+    }
+    selectTab('_action_generalDetails');
+</script>
+
+<script>
+    var dataSet = @Html.Raw(SingleQualSubjectContentModel_o.ResourceGridData);
+        $(document).ready(function () {
+            var targetQualSubjectResourceGrid = $('#targetQualSubjectResourceGrid').DataTable({
+                data: dataSet,
+                columns: @Html.Raw(SingleQualSubjectContentModel_o.ResourceGridColumns),
+                columnDefs: [
+                    { "targets": [0], "visible": false, "searchable": false },
+                    { "targets": [1], "visible": false, "searchable": false },
+                    {
+                        "targets": [2],
+                        "render": function (data, type, row) {
+                            return "<i class=\"fa fa-file-o\"></i>&nbsp;&nbsp;<a data-toggle=\"tooltip\" data-placement=\"top\" title=\"Click here to download!\" href=\"@Url.Action("Download", "Document")?id=" + row[1] + "\">" + data + "</a>";
+                        }
+                    },
+                    {
+                        "targets": [6],
+                        "render": function (data, type, row) {
+                            @{
+                                string resourceAction_s = "";
+                                resourceAction_s += "&nbsp;<a class=\\\"btn btn-xs u-btn-secondary\\\" href=\\\"javascript:ViewResource('\" + row[0] + \"');\\\">Edit&nbsp;</a>";
+                                resourceAction_s += "&nbsp;<a class=\\\"btn btn-xs btn-danger\\\" href=\\\"javascript:DeleteResource('\" + row[0] + \"');\\\">Delete&nbsp;</a>";
+                            }
+                            return "@Html.Raw(resourceAction_s)";
+                        }
+                    }
+                ],
+                order: [1, "asc"]
+            });
+        });
+
+        function DeleteResource(id) {
+            if (confirm("Are you sure you want to delete this resource?")) {
+                var url = "@Url.Action("SingleResourceDelete", "Resource")?id=" + id;
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (data) {
+                        obj = JSON.parse(data);
+                        $('#targetQualSubjectResourceGrid').dataTable().fnClearTable();
+                        if(obj != ''){
+                            $('#targetQualSubjectResourceGrid').dataTable().fnAddData(obj);
+                        }
+
+                    }
+                });
+                e.preventDefault();
+            }
+    }
+
+    function ViewResource(id) {
+        mainContent('@Url.Action("SingleResourceIndex", "Resource")?id=' + id);
+    }
+
+</script>
+

@@ -1,0 +1,12 @@
+﻿@{
+    Layout = "~/Views/Shared/_PaneSimple.cshtml";
+
+    MShed_Web.BOs.SupportBO Support_o = new MShed_Web.BOs.SupportBO();
+    MShed_Web.Models.UIModel.Person.PersonModel PersonModel_o = Support_o.GetCurrentUser();
+}
+
+<div class="row">
+    <div class="col-sm-12 col-lg-12 col-xl-12">
+        <p>Welcome @PersonModel_o.Person_Firstname_s @PersonModel_o.Person_Lastname_s</p>
+    </div>
+</div>

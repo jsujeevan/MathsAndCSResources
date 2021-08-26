@@ -1,0 +1,36 @@
+﻿@model MShed_Web.Models.Dispatching.PageModel
+
+@{ 
+    MShed_Web.Models.Dispatching.GridClickThroughPaneItem ClickthroughPaneItem_o = (MShed_Web.Models.Dispatching.GridClickThroughPaneItem)Model.PaneItem;
+}
+
+
+<div class="g-pa-10">
+    <div class="media g-mb-10">
+        <div class="d-flex align-self-center">
+            <h1 class="g-font-weight-300 g-font-size-28 g-color-black mb-0">@ClickthroughPaneItem_o.PageHeading</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-lg-12 col-xl-12 g-mb-10">
+            <table id="targetGridTable" class="table table-striped table-bordered" style="width:100%"></table>
+        </div>
+    </div>
+    <script>
+    var dataSet = @Html.Raw(ClickthroughPaneItem_o.GridData);
+        $(document).ready(function () {
+            var targetGridTable = $('#targetGridTable').DataTable({
+                data: dataSet,
+                columns: @Html.Raw(ClickthroughPaneItem_o.GridColumns),
+                columnDefs: [{ "targets": [0], "visible": false, "searchable": false }],
+                order: [1, "asc"]
+            });
+            @RenderSection("gridEventHandler",false)
+        });
+    </script>
+    @RenderBody()
+</div>
+
+<script>
+    $("#breadcrumbNav").append('<li class="list-inline-item g-mr-10"><a class="u-link-v5 g-color-gray-dark-v6 g-color-secondary--hover g-valign-middle" href="@Request.Url.AbsoluteUri">@ClickthroughPaneItem_o.PageTitle</a><i class="hs-admin-angle-right g-font-size-12 g-color-gray-light-v6 g-valign-middle g-ml-10"></i></li>');
+</script>
